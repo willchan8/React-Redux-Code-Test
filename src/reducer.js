@@ -10,47 +10,80 @@ const reducer = (state = initialState, action) => {
       let mapWidth = state.mapWidth;
       let mapHeight = state.mapHeight;
       let player = Object.assign({}, state.player);
-      let oldPlayerPosition = player.position;
-      let newPlayerPosition;
-
+      let prevPlayerPosition = player.position;
+      let nextPlayerPosition;
 
       switch(action.keyCode) {
         case 37: // Left
-          newPlayerPosition = player.position - 1;
+          nextPlayerPosition = player.position - 1;
           break;
         case 38: // Up
-          newPlayerPosition = player.position - mapWidth;
+          nextPlayerPosition = player.position - mapWidth;
           break;
         case 39: // Right
-          newPlayerPosition = player.position + 1;
+          nextPlayerPosition = player.position + 1;
           break;
         case 40: // Down
-          newPlayerPosition = player.position + mapWidth;
+          nextPlayerPosition = player.position + mapWidth;
           break;
         default:
-          newPlayerPosition = undefined;
+          nextPlayerPosition = undefined;
           break;
       }
 
-      // Update position of @
-      if (map[newPlayerPosition] === '.') {
-        player.position = newPlayerPosition;
+      // Move player (@) 
+      if (map[nextPlayerPosition] === '.') {
+        player.position = nextPlayerPosition;
         map[player.position] = '@';
-        map[oldPlayerPosition] = '.';
+        map[prevPlayerPosition] = '.';
       }
 
-      // Move enemies toward player using BFS utility function
+      // Move enemies (e) toward player using BFS utility function
+      let prevEnemyPosition;
+      let nextEnemyPosition;
+      let enemyMoves;
       enemies.forEach(enemy => {
-        let enemyMoves = BFS(enemy.position, player.position, map, mapWidth, mapHeight);
-        let newEnemyPosition = enemyMoves[0];
-        let oldEnemyPosition = enemy.position;
-        if (map[newEnemyPosition] === '.') {
-          enemy.position = newEnemyPosition;
+        enemyMoves = BFS(enemy.position, player.position, map, mapWidth, mapHeight);
+        console.log('enemyMoves ', enemyMoves);
+        nextEnemyPosition = enemyMoves[0];
+        prevEnemyPosition = enemy.position;
+        if (map[nextEnemyPosition] === '.') {
+          enemy.position = nextEnemyPosition;
           map[enemy.position] = 'e';
-          map[oldEnemyPosition] = '.';
+          map[prevEnemyPosition] = '.';
         }
       });
 
+      // Player (@) attacks enemies (e)
+      if (map[nextPlayerPosition] === 'e') {
+        enemies.forEach(enemy => {
+          if (nextPlayerPosition === enemy.position) {
+            enemy.hp -= player.damage;
+            console.log('Attacking enemy. Enemy stats: ', enemy);
+          }
+          // Remove enemy from game if its health is 0 or less
+          // if (enemy.hp <= 0) {    
+          //   enemies = enemies.filter(enemy => !(enemy.hp <= 0));
+          //   map[enemy.position] = '.';
+          //   console.log('Enemy destroyed!')
+          // }
+        });
+      }
+
+      // Enemies (e) adjacent to the player (@) will attack
+      enemies.forEach(enemy => {
+        if (
+            enemy.position - 1 === player.position ||
+            enemy.position + 1 === player.position ||
+            enemy.position - mapWidth === player.position ||
+            enemy.position + mapWidth === player.position
+          ) {
+          player.hp -= enemy.damage;
+          console.log('Attacking player. Player stats: ', player);
+        }
+      });
+
+      // Return the next state
       return Object.assign({}, state, {
         map,
         player,
