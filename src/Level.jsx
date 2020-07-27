@@ -30,9 +30,17 @@ function Level(props) {
     <table className="table">
       <tbody>
         {newMap.map((row, rowIndex) => 
-          <tr>{row.map((square, colIndex) => 
-            <td className={handleCharacterStyle(square)} index={(rowIndex * 20) + colIndex}>{square}</td>)}
-          </tr>)}
+          <tr key={rowIndex}>{row.map((square, colIndex) => 
+              <td 
+                className={handleCharacterStyle(square)}
+                index={(rowIndex * 20) + colIndex}
+                key={(rowIndex * 20) + colIndex}
+              >
+                {square}
+              </td>
+            )}
+          </tr>
+        )}
       </tbody>
     </table>
   );

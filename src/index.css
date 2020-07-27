@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/inconsolata-v20-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('./fonts/inconsolata-v20-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('./fonts/inconsolata-v20-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('./fonts/inconsolata-v20-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('./fonts/inconsolata-v20-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('./fonts/inconsolata-v20-latin-regular.svg#Inconsolata') format('svg'); /* Legacy iOS */
+}
+
 .App {
   text-align: center;
 }
@@ -9,7 +22,9 @@ body {
   width: 100%;
   justify-content: center;
   align-items: center;
-  font-family: Consolas;
+  /* Note: Consolas font requires a license. Using alternative Inconsolata font from google font api. */
+  /* font-family: Consolas; */
+  font-family: 'Inconsolata', monospace;
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -47,6 +62,10 @@ td {
   border: 5px solid lightgray;
   position: absolute;
   overflow-y: auto;
+}
+
+.msg-container {
+  padding: 16px 40px;
 }
 
 .player {
