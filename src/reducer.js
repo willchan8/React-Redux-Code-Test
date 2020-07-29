@@ -8,10 +8,12 @@ const reducer = (state = initialState, action) => {
       const mapWidth = state.mapWidth;
       const mapHeight = state.mapHeight;
 
+      // Make copies of individual states to prevent mutating original state
       let log = [...state.log];
       let map = [...state.map];
       let enemies = state.enemies.map(enemy => (Object.assign({}, enemy)));
-      let player = Object.assign({}, state.player); 
+      let player = Object.assign({}, state.player);
+
       let prevPlayerPosition = player.position;
       let nextPlayerPosition;
       let nextPlayerDirection;
@@ -37,13 +39,11 @@ const reducer = (state = initialState, action) => {
           break;
       }
 
-      // Move player (@) position on map if able to move
+      // Move player (@) position on map and add message to log copy if able to move
       if (map[nextPlayerPosition] === '.') {
         player.position = nextPlayerPosition;
         map[player.position] = '@';
         map[prevPlayerPosition] = '.';
-
-        // Add message to log copy
         log.push(`player moved ${nextPlayerDirection}`);
       }
 
