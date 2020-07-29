@@ -4,12 +4,11 @@ import { connect } from 'react-redux';
 //This function is responsible for rendering the level and all
 //the entities in it.
 function Level(props) {
-
   // Convert the map from a 1-D array to a 2-D array.
   const { mapHeight, mapWidth, map } = props;
   const newMap = [];
   for (let i = 0; i < mapHeight; i++) {
-    newMap.push(map.slice(i * mapWidth, (i + 1) * mapWidth ));
+    newMap.push(map.slice(i * mapWidth, (i + 1) * mapWidth));
   }
 
   // Handle conditional style/class changes for player, enemy, and wall.

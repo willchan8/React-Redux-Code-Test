@@ -1,26 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
-class Logger extends React.Component {
-  componentDidUpdate(prevProps) {
-    const { log } = this.props;
-    // Keep logger scrollbar at bottom as messages are added
-    if (log.length !== prevProps.log.length) {
-      let element = document.getElementById("logger");
-      element.scroll(0, element.scrollHeight);
-    }
-  }
+function Logger(props) {
+  const { log } = props;
 
-  render() {
-    const { log } = this.props;
-    return (
-      <div className="drawer" id="logger">
-        <div className="msg-container">
-          {log.slice(-20).map((message, index) => <div className="log-row text" key={index}>{message}</div>)}
-        </div>
+  useEffect(() => {
+    let element = document.getElementById("logger");
+    element.scroll(0, element.scrollHeight);
+  }, [log.length])
+
+  return (
+    <div className="drawer" id="logger">
+      <div className="msg-container">
+        {log.slice(-20).map((message, index) => <div className="text" key={index}>{message}</div>)}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 const mapStateToProps = (state) => ({

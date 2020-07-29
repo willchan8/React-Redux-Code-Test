@@ -14,53 +14,51 @@ const reducer = (state = initialState, action) => {
       let enemies = state.enemies.map(enemy => (Object.assign({}, enemy)));
       let player = Object.assign({}, state.player);
 
-      let prevPlayerPosition = player.position;
+      let prevPlayerPosition = player.position; // Temp variable to store player position at start of turn
       let nextPlayerPosition;
       let nextPlayerDirection;
 
-      switch(action.keyCode) {
+      switch (action.keyCode) {
         case 37: // Left
-          nextPlayerPosition = player.position - 1;
+          nextPlayerPosition = prevPlayerPosition - 1;
           nextPlayerDirection = 'west';
           break;
         case 38: // Up
-          nextPlayerPosition = player.position - mapWidth;
+          nextPlayerPosition = prevPlayerPosition - mapWidth;
           nextPlayerDirection = 'north';
           break;
         case 39: // Right
-          nextPlayerPosition = player.position + 1;
+          nextPlayerPosition = prevPlayerPosition + 1;
           nextPlayerDirection = 'east'
           break;
         case 40: // Down
-          nextPlayerPosition = player.position + mapWidth;
+          nextPlayerPosition = prevPlayerPosition + mapWidth;
           nextPlayerDirection = 'south'
           break;
         default:
           break;
       }
 
-      // Move player (@) position on map and add message to log copy if able to move
+      // Player (@) is only able to move onto any adjacent '.' tile
       if (map[nextPlayerPosition] === '.') {
+        // If the player (@) started a turn adjacent to an enemy (e) and moves away, the player (@) gets attacked by that enemy (e).
+        enemies.forEach(enemy => {
+          if (
+              prevPlayerPosition === enemy.position - 1 ||
+              prevPlayerPosition === enemy.position + 1 ||
+              prevPlayerPosition === enemy.position - mapWidth ||
+              prevPlayerPosition === enemy.position + mapWidth
+            ) {
+            player.hp -= enemy.damage;
+            log.push('enemy attacked player');
+          }
+        });
+        // Update player (@) position and add message to log copy
         player.position = nextPlayerPosition;
         map[player.position] = '@';
         map[prevPlayerPosition] = '.';
         log.push(`player moved ${nextPlayerDirection}`);
       }
-
-      // Move enemies (e) toward player using BFS utility function
-      let prevEnemyPosition;
-      let nextEnemyPosition;
-      let enemyMoves;
-      enemies.forEach(enemy => {
-        enemyMoves = BFS(enemy.position, player.position, map, mapWidth, mapHeight);
-        nextEnemyPosition = enemyMoves[0];
-        prevEnemyPosition = enemy.position;
-        if (map[nextEnemyPosition] === '.') {
-          enemy.position = nextEnemyPosition;
-          map[enemy.position] = 'e';
-          map[prevEnemyPosition] = '.';
-        }
-      });
 
       // Player (@) attacks enemies (e)
       if (map[nextPlayerPosition] === 'e') {
@@ -69,7 +67,7 @@ const reducer = (state = initialState, action) => {
             enemy.hp -= player.damage;
             log.push('player attacked enemy');
           }
-          // Remove enemy from game if its health is 0 or less
+          // Remove enemy (e) from game if its health is 0 or less
           if (enemy.hp <= 0) {    
             enemies = enemies.filter(enemy => !(enemy.hp <= 0));
             map[enemy.position] = '.';
@@ -77,14 +75,18 @@ const reducer = (state = initialState, action) => {
         });
       }
 
-      // Enemies (e) adjacent to the player (@) will attack
+      // Move enemies (e) toward player (@) using BFS utility function
       enemies.forEach(enemy => {
-        if (
-            enemy.position - 1 === player.position ||
-            enemy.position + 1 === player.position ||
-            enemy.position - mapWidth === player.position ||
-            enemy.position + mapWidth === player.position
-          ) {
+        let enemyMoves = BFS(enemy.position, prevPlayerPosition, map, mapWidth, mapHeight);
+        let nextEnemyPosition = enemyMoves[0];
+        let prevEnemyPosition = enemy.position;
+        if ((map[nextEnemyPosition] === '.') && (nextEnemyPosition !== prevPlayerPosition)) {
+          enemy.position = nextEnemyPosition;
+          map[enemy.position] = 'e';
+          map[prevEnemyPosition] = '.';
+        }
+        // Enemies (e) adjacent to the player (@) will attack if player (@) doesn't move
+        if ((nextEnemyPosition === player.position) && (prevPlayerPosition === player.position)) {
           player.hp -= enemy.damage;
           log.push('enemy attacked player');
         }
