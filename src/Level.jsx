@@ -32,8 +32,8 @@ function Level(props) {
           <tr key={rowIndex}>{row.map((square, colIndex) => 
               <td 
                 className={handleCharacterStyle(square)}
-                index={(rowIndex * 20) + colIndex}
-                key={(rowIndex * 20) + colIndex}
+                index={(rowIndex * mapWidth) + colIndex}
+                key={(rowIndex * mapWidth) + colIndex}
               >
                 {square}
               </td>
