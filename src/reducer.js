@@ -80,6 +80,7 @@ const reducer = (state = initialState, action) => {
         let enemyMoves = BFS(enemy.position, prevPlayerPosition, map, mapWidth, mapHeight);
         let nextEnemyPosition = enemyMoves[0];
         let prevEnemyPosition = enemy.position;
+        // Enemies (e) don't move onto this position if it was previously occupied by the player (@). Also prevents bugs where both enemies would overlap.
         if ((map[nextEnemyPosition] === '.') && (nextEnemyPosition !== prevPlayerPosition)) {
           enemy.position = nextEnemyPosition;
           map[enemy.position] = 'e';
